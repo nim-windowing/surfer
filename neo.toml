@@ -1,0 +1,21 @@
+[package]
+name = "surfer"
+description = "A neat, minimal, opinionated windowing library for Nim."
+version = "0.1.0"
+license = "BSD3"
+kind = "Library"
+backend = "C"
+binaries = []
+
+[toolchain]
+version = "2.2.0"
+
+[dependencies]
+"gh:nim-windowing/nayland" = "#714cb0310382de9181b0cc4e8b5a94ed4635057c"
+shakar = ">= 0.1.3"
+xkb = ">= 1.4.1"
+vmath = ">= 2.0.1"
+
+[platforms.native]
+include = ["wayland-egl", "wayland-egl-backend", "glesv2", "egl"]
+link = ["wayland-egl", "wayland-egl-backend", "glesv2", "egl"]
