@@ -11,7 +11,7 @@ binaries = []
 version = "2.2.0"
 
 [dependencies]
-"gh:nim-windowing/nayland" = "#714cb0310382de9181b0cc4e8b5a94ed4635057c"
+"gh:nim-windowing/nayland" = ">= 0.1.1"
 shakar = ">= 0.1.3"
 xkb = ">= 1.4.1"
 vmath = ">= 2.0.1"
