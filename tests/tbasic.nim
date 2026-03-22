@@ -29,7 +29,7 @@ proc main() {.inline.} =
     font.typeset("Hello, surfer!", vec2(180, 180)), translate(vec2(10, 10))
   )
 
-  while true:
+  while not app.closureRequested:
     let eventOpt = app.flushQueue()
     if !eventOpt:
       # If we have no event to consume, continue.
@@ -49,6 +49,8 @@ proc main() {.inline.} =
           addr image.data[y * image.width],
           stride,
         )
+
+      app.markDamaged()
 
       # Tell the compositor that we're ready to draw another frame, if it wishes so.
       app.queueRedraw()
