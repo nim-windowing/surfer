@@ -1,23 +1,10 @@
 # Requires: pixie, chroma
+# Only works when targetting Wayland with a compatible compositor (which is our only backend for now anyways!)
 
 import pkg/[vmath, shakar, surfer, chroma, pixie]
 
-proc main() {.inline.} =
-  let app = newApp("Surfer Desktop Shell", appId = "xyz.xtrayambak.surfer.shell")
-  app.initialize()
-  app.createWindow(ivec2(680, 480), Renderer.Software)
-
-  echo "Has keyboard: " & $hasKeyboard(app)
-  echo "Has cursor: " & $hasCursor(app)
-
-  # Use ControlFlow.Wait for simple GUI apps that don't need
-  # precise timing, and use ControlFlow.Async for high-performance
-  # apps like game engines that need precise timing, at the cost
-  # of increased CPU usage.
-  app.controlFlow = ControlFlow.Wait
-
-  # Create a Pixie image
-  let image = newImage(680, 480)
+proc genImage(width, height: int32): Image =
+  let image = newImage(width, height)
   for i in 0 ..< image.data.len:
     image.data[i] = rgbx(255, 255, 255, 255) # Make the image fully white
 
@@ -32,6 +19,32 @@ proc main() {.inline.} =
     ),
     translate(vec2(10, 10)),
   )
+
+  image
+
+proc main() {.inline.} =
+  let app = newApp("Surfer Desktop Shell", appId = "xyz.xtrayambak.surfer.shell")
+  app.initialize()
+  app.createLayerSurface(
+    Layer.Top,
+    anchors = {Anchor.Bottom, Anchor.Left, Anchor.Right, Anchor.Top},
+    keyboardInteractivity = KeyboardInteractivity.None,
+    renderer = Renderer.Software,
+    namespace = "xyz.xtrayambak.surfer.shell",
+    requestedSize = ivec2(0, 0),
+  )
+
+  echo "Has keyboard: " & $hasKeyboard(app)
+  echo "Has cursor: " & $hasCursor(app)
+
+  # Use ControlFlow.Wait for simple GUI apps that don't need
+  # precise timing, and use ControlFlow.Async for high-performance
+  # apps like game engines that need precise timing, at the cost
+  # of increased CPU usage.
+  app.controlFlow = ControlFlow.Wait
+
+  # Create a Pixie image
+  var image = genImage(640, 480)
 
   while true:
     let eventOpt = app.flushQueue()
@@ -54,6 +67,8 @@ proc main() {.inline.} =
           stride,
         )
 
+      app.markDamaged()
+
       # Tell the compositor that we're ready to draw another frame, if it wishes so.
       app.queueRedraw()
     of EventKind.KeyboardFocusObtained:
@@ -66,6 +81,9 @@ proc main() {.inline.} =
       echo "Key pressed: " & $event.key.code
     of EventKind.KeyRepeated:
       echo "Key repeated: " & $event.key.code
+    of EventKind.WindowResized:
+      echo "Window resized: " & $event.windowSize
+      image = genImage(event.windowSize.x, event.windowSize.y)
     else:
       discard
 

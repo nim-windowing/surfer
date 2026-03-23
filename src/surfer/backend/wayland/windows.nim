@@ -51,7 +51,7 @@ proc queueRedrawWayland*(app: App) =
 proc markWaylandDamaged*(app: App) =
   app.surfaces[0].damage(0, 0, app.windowSize.x, app.windowSize.y)
 
-proc frameCallback(callback: Callback, app: pointer, data: uint32) {.cdecl.} =
+proc frameCallback*(callback: Callback, app: pointer, data: uint32) {.cdecl.} =
   let app = cast[App](app)
 
   # First, we can schedule another frame.
@@ -144,6 +144,25 @@ proc initializeWaylandEGL*(app: App) =
   if not eglMakeCurrent(app.eglDisplay, app.eglSurface, app.eglSurface, app.eglContext):
     raise newException(EGLInitError, "eglMakeCurrent() failed")
 
+proc initializeSurfaceRenderer*(app: App, surface: Surface, dimensions: IVec2) =
+  app.windowSize = dimensions
+
+  case app.renderer
+  of Renderer.Software:
+    if app.pools.surfacePool == nil:
+      allocateShmemPool(app, dimensions)
+
+    allocateSurfaceBuffer(app, dimensions)
+    surface.attach(app.pools.surface, 0, 0)
+    surface.damage(0, 0, dimensions.x, dimensions.y)
+    surface.commit()
+  of Renderer.GLES:
+    app.eglWindow = createEGLWindow(surface, dimensions.x, dimensions.y)
+    initializeWaylandEGL(app)
+
+    surface.damage(0, 0, dimensions.x, dimensions.y)
+    discard eglSwapBuffers(app.eglDisplay, app.eglSurface)
+
 proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   # Firstly, we'll create a `wl_surface`.
   # This is basically what we'll be blitting to.
@@ -193,21 +212,6 @@ proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
 
   surface.frame.listen(cast[ptr AppObj](app), frameCallback)
 
-  # Renderer-specific initialization
-
+  # Renderer-specific initialization\
   app.renderer = renderer
-  case renderer
-  of Renderer.Software:
-    if app.pools.surfacePool == nil:
-      allocateShmemPool(app, dimensions)
-
-    allocateSurfaceBuffer(app, dimensions)
-    surface.attach(app.pools.surface, 0, 0)
-    surface.damage(0, 0, dimensions.x, dimensions.y)
-    surface.commit()
-  of Renderer.GLES:
-    app.eglWindow = createEGLWindow(surface, dimensions.x, dimensions.y)
-    initializeWaylandEGL(app)
-
-    surface.damage(0, 0, dimensions.x, dimensions.y)
-    discard eglSwapBuffers(app.eglDisplay, app.eglSurface)
+  initializeSurfaceRenderer(app, surface, dimensions)

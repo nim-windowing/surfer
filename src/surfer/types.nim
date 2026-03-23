@@ -8,6 +8,7 @@ when usingPlatform(Wayland):
     pkg/nayland/types/protocols/core/
       [buffer, compositor, keyboard, pointer, registry, shm, shm_pool, seat, surface],
     pkg/nayland/types/protocols/xdg_shell/[wm_base, xdg_surface, xdg_toplevel],
+    pkg/nayland/types/protocols/wlr/layer_shell/prelude,
     pkg/nayland/types/egl
 
   import pkg/xkb
@@ -115,6 +116,9 @@ type
 
       keyboardRepeatDelay: int32
       keyboardRepeatRate: int32
+
+      layerShell*: LayerShell
+      layerSurfaces*: seq[LayerSurface]
 
     title, appId: string
     controlFlow*: ControlFlow

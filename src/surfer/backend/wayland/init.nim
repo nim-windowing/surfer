@@ -3,10 +3,11 @@
 ## Copyright (C) 2025 Trayambak Rai (xtrayambak@disroot.org)
 #!fmt: off
 import
-  pkg/nayland/bindings/protocols/[core, xdg_shell],
+  pkg/nayland/bindings/protocols/[core, xdg_shell, wlr_layer_shell_unstable_v1],
   pkg/nayland/types/display,
   pkg/nayland/types/protocols/core/[compositor, registry, seat, shm],
-  pkg/nayland/types/protocols/xdg_shell/[wm_base]
+  pkg/nayland/types/protocols/xdg_shell/[wm_base],
+  pkg/nayland/types/protocols/wlr/layer_shell/prelude
 #!fmt: on
 import pkg/surfer/types, pkg/surfer/backend/wayland/input
 import pkg/shakar
@@ -77,12 +78,30 @@ proc bindShm(app: App) =
 
   app.shm = initShm(boundIface)
 
+proc bindLayerShell(app: App) =
+  const LayerShell = "zwlr_layer_shell_v1"
+  if not app.registry.contains(LayerShell):
+    return
+
+  let iface = app.registry[LayerShell]
+  app.layerShell = initLayerShell(
+    app.registry.bindInterface(
+      iface.name, zwlr_layer_shell_v1_interface.addr, iface.version
+    )
+  )
+
+proc bindOptionalSingletons(app: App) =
+  bindLayerShell(app)
+
 proc bindRequiredSingletons(app: App) =
   # debugecho "App::bindRequiredSingletons()"
   bindCompositor(app)
   bindSeat(app)
   bindXdgWmBase(app)
   bindShm(app)
+
+  # Fetch singletons not absolutely required for basic functioning.
+  bindOptionalSingletons(app)
 
 proc initializeWaylandSeat*(app: App) =
   let keyb = app.seat.getKeyboard()
