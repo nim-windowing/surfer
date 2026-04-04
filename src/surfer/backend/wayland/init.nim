@@ -3,11 +3,12 @@
 ## Copyright (C) 2025 Trayambak Rai (xtrayambak@disroot.org)
 #!fmt: off
 import
-  pkg/nayland/bindings/protocols/[core, xdg_shell, wlr_layer_shell_unstable_v1],
+  pkg/nayland/bindings/protocols/[core, xdg_shell, wlr_layer_shell_unstable_v1, idle_inhibit_unstable_v1],
   pkg/nayland/types/display,
   pkg/nayland/types/protocols/core/[compositor, registry, seat, shm],
   pkg/nayland/types/protocols/xdg_shell/[wm_base],
-  pkg/nayland/types/protocols/wlr/layer_shell/prelude
+  pkg/nayland/types/protocols/wlr/layer_shell/prelude,
+  pkg/nayland/types/protocols/idle_inhibit/prelude
 #!fmt: on
 import pkg/surfer/types, pkg/surfer/backend/wayland/input
 import pkg/shakar
@@ -90,8 +91,21 @@ proc bindLayerShell(app: App) =
     )
   )
 
+proc bindIdleInhibitor(app: App) =
+  const IdleInhibitor = "zwp_idle_inhibit_manager_v1"
+  if not app.registry.contains(IdleInhibitor):
+    return
+
+  let iface = app.registry[IdleInhibitor]
+  app.idleInhibitManager = initInhibitManager(
+    app.registry.bindInterface(
+      iface.name, zwp_idle_inhibit_manager_v1_interface.addr, iface.version
+    )
+  )
+
 proc bindOptionalSingletons(app: App) =
   bindLayerShell(app)
+  bindIdleInhibitor(app)
 
 proc bindRequiredSingletons(app: App) =
   # debugecho "App::bindRequiredSingletons()"

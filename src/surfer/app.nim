@@ -84,6 +84,10 @@ proc setTitle*(app: App, title: string) =
   when usingPlatform(Wayland):
     setWaylandTitle(app, title)
 
+proc setIdleInhibit*(app: App, value: bool) =
+  when usingPlatform(Wayland):
+    setWaylandIdleInhibit(app, value)
+
 proc markDamaged*(app: App) =
   when usingPlatform(Wayland):
     markWaylandDamaged(app)
