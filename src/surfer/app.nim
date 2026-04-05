@@ -88,6 +88,10 @@ proc setIdleInhibit*(app: App, value: bool) =
   when usingPlatform(Wayland):
     setWaylandIdleInhibit(app, value)
 
+proc ringSystemBell*(app: App) =
+  when usingPlatform(Wayland):
+    ringWaylandSystemBell(app)
+
 proc markDamaged*(app: App) =
   when usingPlatform(Wayland):
     markWaylandDamaged(app)

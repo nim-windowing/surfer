@@ -10,6 +10,7 @@ when usingPlatform(Wayland):
     pkg/nayland/types/protocols/xdg_shell/[wm_base, xdg_surface, xdg_toplevel],
     pkg/nayland/types/protocols/wlr/layer_shell/prelude,
     pkg/nayland/types/protocols/idle_inhibit/prelude,
+    pkg/nayland/types/protocols/xdg_system_bell,
     pkg/nayland/types/egl
 
   import pkg/xkb
@@ -123,6 +124,8 @@ type
 
       idleInhibitManager*: InhibitManager
       idleInhibitor*: IdleInhibitor
+
+      xdgSystemBell*: XDGSystemBell
 
     title, appId: string
     controlFlow*: ControlFlow

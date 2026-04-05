@@ -92,6 +92,7 @@ The items here are non-sequential.
 - [X] OpenGL ES rendering support
 - [ ] Layer shell support
 - [X] Idle inhibit support
+- [X] System bell support
 - [ ] Presentation time support
 - [ ] Tablet support
 - [ ] Fractional scaling support

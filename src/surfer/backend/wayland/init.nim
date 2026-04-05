@@ -3,12 +3,13 @@
 ## Copyright (C) 2025 Trayambak Rai (xtrayambak@disroot.org)
 #!fmt: off
 import
-  pkg/nayland/bindings/protocols/[core, xdg_shell, wlr_layer_shell_unstable_v1, idle_inhibit_unstable_v1],
+  pkg/nayland/bindings/protocols/[core, xdg_shell, wlr_layer_shell_unstable_v1, idle_inhibit_unstable_v1, xdg_system_bell_v1],
   pkg/nayland/types/display,
   pkg/nayland/types/protocols/core/[compositor, registry, seat, shm],
   pkg/nayland/types/protocols/xdg_shell/[wm_base],
   pkg/nayland/types/protocols/wlr/layer_shell/prelude,
-  pkg/nayland/types/protocols/idle_inhibit/prelude
+  pkg/nayland/types/protocols/idle_inhibit/prelude,
+  pkg/nayland/types/protocols/xdg_system_bell
 #!fmt: on
 import pkg/surfer/types, pkg/surfer/backend/wayland/input
 import pkg/shakar
@@ -103,9 +104,22 @@ proc bindIdleInhibitor(app: App) =
     )
   )
 
+proc bindSystemBell(app: App) =
+  const SystemBell = "xdg_system_bell_v1"
+  if not app.registry.contains(SystemBell):
+    return
+
+  let iface = app.registry[SystemBell]
+  app.xdgSystemBell = initXDGSystemBell(
+    app.registry.bindInterface(
+      iface.name, xdg_system_bell_v1_interface.addr, iface.version
+    )
+  )
+
 proc bindOptionalSingletons(app: App) =
   bindLayerShell(app)
   bindIdleInhibitor(app)
+  bindSystemBell(app)
 
 proc bindRequiredSingletons(app: App) =
   # debugecho "App::bindRequiredSingletons()"
