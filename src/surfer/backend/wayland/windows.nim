@@ -193,6 +193,7 @@ proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
 
   xdgToplevel.onClose = proc(_: XDGToplevel) =
     app.closureRequested = true
+    app.queue &= Event(kind: EventKind.ClosureRequested)
 
   xdgToplevel.onConfigure = proc(_: XDGToplevel, width, height: int32) =
     # debugecho "XDGToplevel::configure"

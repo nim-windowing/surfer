@@ -42,6 +42,7 @@ type
     KeyPressed = 4
     KeyRepeated = 5
     WindowResized = 6
+    ClosureRequested = 7
 
   KeyState* {.pure, size: sizeof(uint8).} = enum
     Released = 0

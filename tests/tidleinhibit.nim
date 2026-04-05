@@ -65,6 +65,8 @@ proc main() {.inline.} =
       echo "Key pressed: " & $event.key.code
     of EventKind.KeyRepeated:
       echo "Key repeated: " & $event.key.code
+    of EventKind.ClosureRequested:
+      echo "Window needs to close"
     else:
       discard
 

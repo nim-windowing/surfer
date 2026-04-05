@@ -52,6 +52,7 @@ proc createWaylandLayerSurface*(
 
   layerSurface.onClosed = proc(_: LayerSurface) =
     app.closureRequested = true
+    app.queue &= Event(kind: EventKind.ClosureRequested)
 
   layerSurface.attachCallbacks()
 

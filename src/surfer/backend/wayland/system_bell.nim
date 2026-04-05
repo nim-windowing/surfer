@@ -7,6 +7,9 @@ import pkg/nayland/types/protocols/xdg_system_bell, pkg/surfer/types
 privateAccess(types.App)
 
 proc ringWaylandSystemBell*(app: App) =
+  if app.xdgSystemBell == nil:
+    return # NOTE: I think raising an exception for such a trivial op would be overkill.
+
   app.xdgSystemBell.ring(
     if app.surfaces.len > 0:
       app.surfaces[0]
