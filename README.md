@@ -90,12 +90,12 @@ The items here are non-sequential.
 - [X] Automatic libxkbcommon initialization
 - [ ] Pointer input support
 - [X] OpenGL ES rendering support
-- [ ] Layer shell support
+- [X] Layer shell support
 - [X] Idle inhibit support
 - [X] System bell support
 - [ ] Presentation time support
 - [ ] Tablet support
-- [ ] Fractional scaling support
+- [X] Fractional scale support
 
 # distant roadmap
 - [ ] win32 backend

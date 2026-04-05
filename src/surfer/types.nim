@@ -11,6 +11,7 @@ when usingPlatform(Wayland):
     pkg/nayland/types/protocols/wlr/layer_shell/prelude,
     pkg/nayland/types/protocols/idle_inhibit/prelude,
     pkg/nayland/types/protocols/xdg_system_bell,
+    pkg/nayland/types/protocols/fractional_scale/prelude,
     pkg/nayland/types/egl
 
   import pkg/xkb
@@ -43,6 +44,7 @@ type
     KeyRepeated = 5
     WindowResized = 6
     ClosureRequested = 7
+    PreferredRenderScale = 8
 
   KeyState* {.pure, size: sizeof(uint8).} = enum
     Released = 0
@@ -59,6 +61,8 @@ type
       key*: KeyEvent
     of {EventKind.WindowResized}:
       windowSize*: IVec2
+    of EventKind.PreferredRenderScale:
+      preferredScale*: uint32
     else:
       discard
 
@@ -127,6 +131,9 @@ type
       idleInhibitor*: IdleInhibitor
 
       xdgSystemBell*: XDGSystemBell
+
+      fractionalScaleManager*: FractionalScaleManager
+      fractionalScale: FractionalScale
 
     title, appId: string
     controlFlow*: ControlFlow

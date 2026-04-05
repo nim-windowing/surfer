@@ -67,6 +67,8 @@ proc main() {.inline.} =
       echo "Key repeated: " & $event.key.code
     of EventKind.ClosureRequested:
       echo "Window needs to close"
+    of EventKind.PreferredRenderScale:
+      echo "Preferred rendering scale: " & $event.preferredScale
     else:
       discard
 

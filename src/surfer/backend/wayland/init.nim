@@ -2,17 +2,21 @@
 ##
 ## Copyright (C) 2025 Trayambak Rai (xtrayambak@disroot.org)
 #!fmt: off
+import std/importutils
 import
-  pkg/nayland/bindings/protocols/[core, xdg_shell, wlr_layer_shell_unstable_v1, idle_inhibit_unstable_v1, xdg_system_bell_v1],
+  pkg/nayland/bindings/protocols/[core, xdg_shell, wlr_layer_shell_unstable_v1, idle_inhibit_unstable_v1, xdg_system_bell_v1, fractional_scale_v1],
   pkg/nayland/types/display,
   pkg/nayland/types/protocols/core/[compositor, registry, seat, shm],
   pkg/nayland/types/protocols/xdg_shell/[wm_base],
   pkg/nayland/types/protocols/wlr/layer_shell/prelude,
   pkg/nayland/types/protocols/idle_inhibit/prelude,
-  pkg/nayland/types/protocols/xdg_system_bell
+  pkg/nayland/types/protocols/xdg_system_bell,
+  pkg/nayland/types/protocols/fractional_scale/prelude
 #!fmt: on
 import pkg/surfer/types, pkg/surfer/backend/wayland/input
 import pkg/shakar
+
+privateAccess(types.App)
 
 proc checkRequiredProtocols(registry: Registry) =
   # debugecho "Registry::checkRequiredProtocols()"
@@ -116,10 +120,23 @@ proc bindSystemBell(app: App) =
     )
   )
 
+proc bindFractionalScale(app: App) =
+  const FracScale = "wp_fractional_scale_manager_v1"
+  if not app.registry.contains(FracScale):
+    return
+
+  let iface = app.registry[FracScale]
+  app.fractionalScaleManager = initFractionalScaleManager(
+    app.registry.bindInterface(
+      iface.name, wp_fractional_scale_manager_v1_interface.addr, iface.version
+    )
+  )
+
 proc bindOptionalSingletons(app: App) =
   bindLayerShell(app)
   bindIdleInhibitor(app)
   bindSystemBell(app)
+  bindFractionalScale(app)
 
 proc bindRequiredSingletons(app: App) =
   # debugecho "App::bindRequiredSingletons()"
@@ -140,6 +157,20 @@ proc initializeWaylandSeat*(app: App) =
     # Why couldn't we have `ptr void`? I guess we just can't have nice things. :(
   if *pointer:
     app.wpointer = &pointer
+
+proc initializeWaylandAux*(app: App) =
+  ## Auxiliary Wayland systems init, when a window is instantiated.
+  assert(
+    app.surfaces.len > 0,
+    "BUG: wayland::init::initializeWaylandAux() called without any window (toplevel+surface) having been created!",
+  )
+
+  # If fractional scaling is supported, we should probably query the compositor for it.
+  if app.fractionalScaleManager != nil:
+    app.fractionalScale = app.fractionalScaleManager.getFractionalScale(app.surfaces[0])
+    app.fractionalScale.onPreferredScale = proc(scale: uint32) =
+      app.queue &= Event(kind: EventKind.PreferredRenderScale, preferredScale: scale)
+    app.fractionalScale.attachCallbacks()
 
 proc initializeWaylandBackend*(app: App) =
   ## This routine initializes the Wayland backend and its required objects.

@@ -11,7 +11,7 @@ import
 import pkg/[vmath, shakar]
 import
   pkg/surfer/types,
-  pkg/surfer/backend/wayland/allocator,
+  pkg/surfer/backend/wayland/[allocator, init],
   pkg/surfer/backend/wayland/bindings/egl
 
 privateAccess(types.App)
@@ -216,3 +216,4 @@ proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   # Renderer-specific initialization\
   app.renderer = renderer
   initializeSurfaceRenderer(app, surface, dimensions)
+  initializeWaylandAux(app)
