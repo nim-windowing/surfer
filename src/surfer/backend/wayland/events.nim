@@ -8,12 +8,14 @@ import pkg/surfer/types
 privateAccess(types.App)
 
 proc flushWaylandQueue*(app: App): Option[Event] =
-  if app.controlFlow == ControlFlow.Async:
-    # If the app expects an asynchronous events dispatch,
-    app.display.roundtrip()
-  else:
-    # Otherwise, if the app expects a synchronous roundtrip,
-    app.display.dispatch()
+  if app.queue.len < 1:
+    # We must only look for new events if our pre-existing queue is already empty.
+    if app.controlFlow == ControlFlow.Async:
+      # If the app expects an asynchronous events dispatch,
+      app.display.roundtrip()
+    else:
+      # Otherwise, if the app expects a synchronous roundtrip,
+      app.display.dispatch()
 
   # Now, we can just check if one of our handlers placed anything in the queue
   if app.queue.len > 0:
