@@ -2,7 +2,9 @@
 ##
 ## Copyright (C) 2025 Trayambak Rai (xtrayambak@disroot.org)
 import std/[importutils, monotimes, options, posix, times]
-import pkg/nayland/types/protocols/core/[keyboard, surface], pkg/[shakar, xkb]
+import
+  pkg/nayland/types/protocols/core/[keyboard, surface, pointer],
+  pkg/[shakar, vmath, xkb]
 import pkg/surfer/types
 
 privateAccess(types.App)
@@ -97,6 +99,26 @@ proc initializeWaylandKeyboard(app: App) =
 
   app.keyboard.attachCallbacks()
 
+proc initializeWaylandPointer(app: App) =
+  app.wpointer.onEnter = proc(
+      _: Pointer, serial: uint32, surface: Surface, sx, sy: float
+  ) =
+    app.queue &= Event(kind: EventKind.CursorFocusObtained, cursorPos: vec2(sx, sy))
+
+  app.wpointer.onMotion = proc(_: Pointer, time: uint32, sx, sy: float) =
+    app.queue &=
+      Event(kind: EventKind.CursorMove, cursorPos: vec2(sx, sy), cursorTime: time)
+
+  app.wpointer.onFrame = proc(_: Pointer) =
+    discard
+  app.wpointer.onLeave = proc(_: Pointer, serial: uint32, surface: Surface) =
+    app.queue &= Event(kind: EventKind.CursorFocusLost)
+
+  app.wpointer.onAxis = proc(_: Pointer, time, axis: uint32, value: float) =
+    discard
+
+  app.wpointer.attachCallbacks()
+
 proc flushWaylandKeyboardEvents*(app: App) =
   if !app.repeatedKey:
     return
@@ -114,3 +136,6 @@ proc flushWaylandKeyboardEvents*(app: App) =
 proc initializeWaylandInput*(app: App) =
   if hasKeyboard(app):
     initializeWaylandKeyboard(app)
+
+  if hasCursor(app):
+    initializeWaylandPointer(app)

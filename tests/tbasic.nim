@@ -62,6 +62,14 @@ proc main() {.inline.} =
       echo "Key pressed: " & $event.key.code
     of EventKind.KeyRepeated:
       echo "Key repeated: " & $event.key.code
+    of EventKind.PreferredRenderScale:
+      echo "Preferred render scale: " & $event.preferredScale
+    of EventKind.CursorFocusObtained:
+      echo "Cursor focus on surface"
+    of EventKind.CursorFocusLost:
+      echo "Cursor focus lost"
+    of EventKind.CursorMove:
+      echo "Cursor moved to " & $event.cursorPos
     else:
       discard
 

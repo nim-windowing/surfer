@@ -45,6 +45,9 @@ type
     WindowResized = 6
     ClosureRequested = 7
     PreferredRenderScale = 8
+    CursorFocusObtained = 9
+    CursorFocusLost = 10
+    CursorMove = 11
 
   KeyState* {.pure, size: sizeof(uint8).} = enum
     Released = 0
@@ -63,6 +66,9 @@ type
       windowSize*: IVec2
     of EventKind.PreferredRenderScale:
       preferredScale*: uint32
+    of {EventKind.CursorFocusObtained, EventKind.CursorMove}:
+      cursorPos*: Vec2
+      cursorTime*: uint32 ## NOTE: Only for `EventKind.CursorMove`!
     else:
       discard
 
