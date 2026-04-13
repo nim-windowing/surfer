@@ -4,7 +4,7 @@
 import std/[importutils, monotimes, options, posix, times]
 import
   pkg/nayland/types/protocols/core/[keyboard, surface, pointer],
-  pkg/[shakar, vmath, xkb]
+  pkg/[linux_input, shakar, vmath, xkb]
 import pkg/surfer/types
 
 privateAccess(types.App)
@@ -103,19 +103,33 @@ proc initializeWaylandPointer(app: App) =
   app.wpointer.onEnter = proc(
       _: Pointer, serial: uint32, surface: Surface, sx, sy: float
   ) =
-    app.queue &= Event(kind: EventKind.CursorFocusObtained, cursorPos: vec2(sx, sy))
+    app.queue &=
+      Event(kind: EventKind.CursorFocusObtained, cursor: CursorEvent(pos: vec2(sx, sy)))
 
   app.wpointer.onMotion = proc(_: Pointer, time: uint32, sx, sy: float) =
     app.queue &=
-      Event(kind: EventKind.CursorMove, cursorPos: vec2(sx, sy), cursorTime: time)
+      Event(
+        kind: EventKind.CursorMove, cursor: CursorEvent(pos: vec2(sx, sy), time: time)
+      )
 
   app.wpointer.onFrame = proc(_: Pointer) =
     discard
+      # TODO: Ideally we should batch together every other callback's data into one place before this is called, but I don't really see a reason to right now since it works _mostly_ fine. That being said, we should probably do that eventually.
+
   app.wpointer.onLeave = proc(_: Pointer, serial: uint32, surface: Surface) =
     app.queue &= Event(kind: EventKind.CursorFocusLost)
 
   app.wpointer.onAxis = proc(_: Pointer, time, axis: uint32, value: float) =
     discard
+
+  app.wpointer.onButton = proc(
+      _: Pointer, serial: uint32, time: uint32, button: uint32, state: ButtonState
+  ) =
+    app.queue &=
+      Event(
+        kind: EventKind.CursorClick,
+        cursor: CursorEvent(time: time, state: state, button: toButton(button)),
+      )
 
   app.wpointer.attachCallbacks()
 

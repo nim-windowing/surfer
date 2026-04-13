@@ -69,7 +69,12 @@ proc main() {.inline.} =
     of EventKind.CursorFocusLost:
       echo "Cursor focus lost"
     of EventKind.CursorMove:
-      echo "Cursor moved to " & $event.cursorPos
+      echo "Cursor moved to " & $event.cursor.pos
+    of EventKind.CursorClick:
+      if event.cursor.state == ButtonState.Released:
+        echo "Mouse click released: " & $event.cursor.button
+      else:
+        echo "Mouse clicked: " & $event.cursor.button
     else:
       discard
 

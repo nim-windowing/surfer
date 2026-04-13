@@ -14,8 +14,10 @@ when usingPlatform(Wayland):
     pkg/nayland/types/protocols/fractional_scale/prelude,
     pkg/nayland/types/egl
 
-  import pkg/xkb
+  import pkg/[linux_input, xkb]
   import pkg/surfer/backend/wayland/bindings/egl
+
+  export linux_input, ButtonState
 
 when usingPlatform(Wayland):
   type Pools* = object
@@ -48,6 +50,7 @@ type
     CursorFocusObtained = 9
     CursorFocusLost = 10
     CursorMove = 11
+    CursorClick = 12
 
   KeyState* {.pure, size: sizeof(uint8).} = enum
     Released = 0
@@ -58,6 +61,14 @@ type
     code*: uint32
     time*: uint32
 
+  CursorEvent* = object
+    pos*: Vec2
+    time*: uint32 ## NOTE: Only for `EventKind.CursorMove`!
+
+    when usingPlatform(Wayland):
+      state*: ButtonState ## NOTE: Only for `EventKind.CursorClick`!
+      button*: linux_input.Button
+
   Event* = object
     case kind*: EventKind
     of {EventKind.KeyReleased, EventKind.KeyPressed, EventKind.KeyRepeated}:
@@ -66,9 +77,8 @@ type
       windowSize*: IVec2
     of EventKind.PreferredRenderScale:
       preferredScale*: uint32
-    of {EventKind.CursorFocusObtained, EventKind.CursorMove}:
-      cursorPos*: Vec2
-      cursorTime*: uint32 ## NOTE: Only for `EventKind.CursorMove`!
+    of {EventKind.CursorFocusObtained, EventKind.CursorMove, EventKind.CursorClick}:
+      cursor*: CursorEvent
     else:
       discard
 
