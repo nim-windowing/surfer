@@ -14,7 +14,7 @@
       "checksum": "e264c434bf6d29c0096aec15f49e4ed0c5e57fc771cc22d7329b4f0257a76c83"
     },
     "gh:nim-windowing/linux_input": {
-      "version": "0.0.0",
+      "version": "0.1.0",
       "commit": "1e5f5b68af67e18da08351262b3803fcd485b6ff",
       "url": "gh:nim-windowing/linux_input",
       "checksum": "e9a24a6c64773620c53ece4f844c4af93235d61ef250b7b6fcadd40d221c37d2"
@@ -50,10 +50,10 @@
       "checksum": "6a3ea94af15560ff056215e4e9569f01c8ed6eca4cafc1e40b2760a2b8c1377b"
     },
     "nayland": {
-      "version": "0.1.3",
-      "commit": "d688b95c51fdaf4e99e381c5133ac286215ed4a5",
+      "version": "0.1.32",
+      "commit": "b9df15e337eca3b0dcb63113408f330eb778b95c",
       "url": "https://github.com/nim-windowing/nayland",
-      "checksum": "b2f63615bce6b442113f8386595bf8c46e703908decf191efce630cd1b0534b5"
+      "checksum": "9de54da1dee776d201160c64d92a75e9728521410003490bafba1c5ecba6920f"
     },
     "bumpy": {
       "version": "1.1.3",
