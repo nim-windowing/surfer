@@ -120,7 +120,16 @@ proc initializeWaylandPointer(app: App) =
     app.queue &= Event(kind: EventKind.CursorFocusLost)
 
   app.wpointer.onAxis = proc(_: Pointer, time, axis: uint32, value: float) =
-    discard
+    app.queue &= Event(kind: EventKind.CursorScroll, cursor: CursorEvent(scroll: value))
+
+  app.wpointer.onAxisSource = proc(_: Pointer, source: uint32) =
+    discard # echo "axis source " & $source
+
+  app.wpointer.onAxisRelativeDirection = proc(_: Pointer, axis, direction: uint32) =
+    discard # echo "axis relative dir axis=" & $axis & " dir=" & $direction
+
+  app.wpointer.onAxisValue120 = proc(_: Pointer, axis: uint32, value120: int32) =
+    discard # echo "axis value120 axis=" & $axis & " value120=" & $value120
 
   app.wpointer.onButton = proc(
       _: Pointer, serial: uint32, time: uint32, button: uint32, state: ButtonState

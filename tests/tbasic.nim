@@ -75,6 +75,8 @@ proc main() {.inline.} =
         echo "Mouse click released: " & $event.cursor.button
       else:
         echo "Mouse clicked: " & $event.cursor.button
+    of EventKind.CursorScroll:
+      echo "Cursor scroll " & $event.cursor.scroll
     else:
       discard
 

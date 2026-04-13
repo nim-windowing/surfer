@@ -51,6 +51,7 @@ type
     CursorFocusLost = 10
     CursorMove = 11
     CursorClick = 12
+    CursorScroll = 13
 
   KeyState* {.pure, size: sizeof(uint8).} = enum
     Released = 0
@@ -69,6 +70,8 @@ type
       state*: ButtonState ## NOTE: Only for `EventKind.CursorClick`!
       button*: linux_input.Button
 
+    scroll*: float
+
   Event* = object
     case kind*: EventKind
     of {EventKind.KeyReleased, EventKind.KeyPressed, EventKind.KeyRepeated}:
@@ -77,7 +80,10 @@ type
       windowSize*: IVec2
     of EventKind.PreferredRenderScale:
       preferredScale*: uint32
-    of {EventKind.CursorFocusObtained, EventKind.CursorMove, EventKind.CursorClick}:
+    of {
+      EventKind.CursorFocusObtained, EventKind.CursorMove, EventKind.CursorClick,
+      EventKind.CursorScroll,
+    }:
       cursor*: CursorEvent
     else:
       discard

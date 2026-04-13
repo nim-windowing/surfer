@@ -88,13 +88,15 @@ The items here are non-sequential.
 - [X] Software rendering support
 - [X] Keyboard input support (repeating is handled internally by Surfer, while respecting the compositor's repeat hints)
 - [X] Automatic libxkbcommon initialization
-- [ ] Pointer input support
+- [X] Pointer input support
 - [X] OpenGL ES rendering support
 - [X] Layer shell support
 - [X] Idle inhibit support
 - [X] System bell support
 - [ ] Presentation time support
 - [ ] Tablet support
+- [ ] Vulkan support
+- [ ] Cursor shape support
 - [X] Fractional scale support
 
 # distant roadmap
