@@ -32,20 +32,18 @@ proc allocateShmemPool(app: App, size: IVec2) =
   app.pools.surfacePoolFd = shmem.fd
 
 proc allocateSurfaceBuffer*(app: App, size: IVec2) =
-  app.pools.surface =
-    &app.pools.surfacePool.createBuffer(
-      offset = 0'i32,
-      width = size.x,
-      height = size.y,
-      stride = size.x * 4,
-      format = ShmFormat.ARGB8888,
-    )
+  app.pools.surface = &app.pools.surfacePool.createBuffer(
+    offset = 0'i32,
+    width = size.x,
+    height = size.y,
+    stride = size.x * 4,
+    format = ShmFormat.ARGB8888,
+  )
 
 proc queueRedrawWayland*(app: App) =
-  if app.pools.surface == nil:
-    return
+  if app.pools.surface != nil:
+    app.surfaces[0].attach(app.pools.surface, 0, 0)
 
-  app.surfaces[0].attach(app.pools.surface, 0, 0)
   app.surfaces[0].commit()
 
 proc markWaylandDamaged*(app: App) =
