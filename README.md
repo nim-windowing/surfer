@@ -14,6 +14,13 @@ $ neo add gh:nim-windowing/surfer
 ```
 
 # basic example
+Surfer is designed to be an easy-to-use library, with minimal gotchas like global states that come to vex you later on.
+- [Basic CPU rendering](https://github.com/nim-windowing/surfer/blob/master/tests/tbasic.nim)
+- [Layer Shell example](https://github.com/nim-windowing/surfer/blob/master/tests/tdesktopshell.nim)
+- [Idle Inhibit example](https://github.com/nim-windowing/surfer/blob/master/tests/tidleinhibit.nim)
+- [EGL + OpenGL ES example](https://github.com/nim-windowing/surfer/blob/master/tests/tbasicegl.nim)
+
+Here's a tiny program that uses CPU rendering. Surfer tries to abstract away buffer allocation to the best of its abilities, due to its origin as the windowing backend for a software-rendered terminal emulator, [nitty](https://github.com/xTrayambak/nitty).
 ```nim
 import pkg/[vmath, shakar, surfer, chroma, pixie]
 
@@ -97,6 +104,7 @@ The items here are non-sequential.
 - [ ] Tablet support
 - [ ] Vulkan support
 - [ ] Cursor shape support
+- [ ] Clipboard support
 - [X] Fractional scale support
 
 # distant roadmap
