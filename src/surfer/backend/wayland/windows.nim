@@ -1,7 +1,7 @@
 ## Routines for creating and managing "windows" (XDG toplevels)
 ##
 ## Copyright (C) 2025 Trayambak Rai (xtrayambak@disroot.org)
-import std/[importutils, options, posix]
+import std/[importutils, options, posix, strutils]
 #!fmt: off
 import
   pkg/nayland/types/[egl, display],
@@ -41,8 +41,13 @@ proc allocateSurfaceBuffer*(app: App, size: IVec2) =
   )
 
 proc queueRedrawWayland*(app: App) =
-  if app.pools.surface != nil:
+  if app.renderer == Renderer.Software and app.pools.surface != nil:
     app.surfaces[0].attach(app.pools.surface, 0, 0)
+  elif app.renderer == Renderer.GLES:
+    assert(
+      eglSwapBuffers(app.eglDisplay, app.eglSurface),
+      "eglSwapBuffers() failed! Code: 0x" & $toHex(eglGetError()),
+    )
 
   app.surfaces[0].commit()
 
