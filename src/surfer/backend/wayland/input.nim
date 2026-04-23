@@ -4,6 +4,7 @@
 import std/[importutils, monotimes, options, posix, times]
 import
   pkg/nayland/types/protocols/core/[keyboard, surface, pointer],
+  pkg/nayland/types/protocols/cursor_shape/prelude,
   pkg/[linux_input, shakar, vmath, xkb]
 import pkg/surfer/types
 
@@ -103,6 +104,7 @@ proc initializeWaylandPointer(app: App) =
   app.wpointer.onEnter = proc(
       _: Pointer, serial: uint32, surface: Surface, sx, sy: float
   ) =
+    app.currentPointerEnterSerial = serial
     app.queue &=
       Event(kind: EventKind.CursorFocusObtained, cursor: CursorEvent(pos: vec2(sx, sy)))
 
@@ -142,6 +144,10 @@ proc initializeWaylandPointer(app: App) =
 
   app.wpointer.attachCallbacks()
 
+  # If we have cursor shaping, init that too.
+  if app.cursorShapeManager != nil:
+    app.cursorShapeDevice = app.cursorShapeManager.getPointer(app.wpointer)
+
 proc flushWaylandKeyboardEvents*(app: App) =
   if !app.repeatedKey:
     return
@@ -155,6 +161,13 @@ proc flushWaylandKeyboardEvents*(app: App) =
     app.queue &=
       Event(kind: EventKind.KeyRepeated, key: KeyEvent(code: &app.repeatedKey))
     app.lastRepeatSignal = elapsed
+
+proc setWaylandCursorShape*(app: App, shape: CursorShape): bool =
+  if app.cursorShapeDevice == nil:
+    return false
+
+  app.cursorShapeDevice.setShape(app.currentPointerEnterSerial, shape)
+  true
 
 proc initializeWaylandInput*(app: App) =
   if hasKeyboard(app):

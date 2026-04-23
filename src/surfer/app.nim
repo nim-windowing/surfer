@@ -96,6 +96,10 @@ proc markDamaged*(app: App) =
   when usingPlatform(Wayland):
     markWaylandDamaged(app)
 
+proc setCursorShape*(app: App, shape: CursorShape): bool {.discardable.} =
+  when usingPlatform(Wayland):
+    return setWaylandCursorShape(app, shape)
+
 proc newApp*(title: string = "Surfer", appId: string = "xyz.xtrayambak.surfer"): App =
   App(title: title, appId: appId)
 

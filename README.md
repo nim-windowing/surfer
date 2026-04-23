@@ -103,7 +103,7 @@ The items here are non-sequential.
 - [ ] Presentation time support
 - [ ] Tablet support
 - [ ] Vulkan support
-- [ ] Cursor shape support
+- [X] Cursor shape support
 - [ ] Clipboard support
 - [X] Fractional scale support
 

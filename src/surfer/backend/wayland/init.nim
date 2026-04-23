@@ -1,18 +1,20 @@
 ## Routines for initializing the Wayland backend
 ##
 ## Copyright (C) 2025 Trayambak Rai (xtrayambak@disroot.org)
-#!fmt: off
 import std/importutils
 import
-  pkg/nayland/bindings/protocols/[core, xdg_shell, wlr_layer_shell_unstable_v1, idle_inhibit_unstable_v1, xdg_system_bell_v1, fractional_scale_v1],
+  pkg/nayland/bindings/protocols/[
+    core, cursor_shape_v1, xdg_shell, wlr_layer_shell_unstable_v1,
+    idle_inhibit_unstable_v1, xdg_system_bell_v1, fractional_scale_v1,
+  ],
   pkg/nayland/types/display,
   pkg/nayland/types/protocols/core/[compositor, registry, seat, shm],
   pkg/nayland/types/protocols/xdg_shell/[wm_base],
   pkg/nayland/types/protocols/wlr/layer_shell/prelude,
   pkg/nayland/types/protocols/idle_inhibit/prelude,
   pkg/nayland/types/protocols/xdg_system_bell,
-  pkg/nayland/types/protocols/fractional_scale/prelude
-#!fmt: on
+  pkg/nayland/types/protocols/fractional_scale/prelude,
+  pkg/nayland/types/protocols/cursor_shape/prelude
 import pkg/surfer/types, pkg/surfer/backend/wayland/input
 import pkg/shakar
 
@@ -132,11 +134,24 @@ proc bindFractionalScale(app: App) =
     )
   )
 
+proc bindCursorShape(app: App) =
+  const CursorShape = "wp_cursor_shape_manager_v1"
+  if not app.registry.contains(CursorShape):
+    return
+
+  let iface = app.registry[CursorShape]
+  app.cursorShapeManager = initCursorShapeManager(
+    app.registry.bindInterface(
+      iface.name, wp_cursor_shape_manager_v1_interface.addr, iface.version
+    )
+  )
+
 proc bindOptionalSingletons(app: App) =
   bindLayerShell(app)
   bindIdleInhibitor(app)
   bindSystemBell(app)
   bindFractionalScale(app)
+  bindCursorShape(app)
 
 proc bindRequiredSingletons(app: App) =
   # debugecho "App::bindRequiredSingletons()"

@@ -12,12 +12,13 @@ when usingPlatform(Wayland):
     pkg/nayland/types/protocols/idle_inhibit/prelude,
     pkg/nayland/types/protocols/xdg_system_bell,
     pkg/nayland/types/protocols/fractional_scale/prelude,
+    pkg/nayland/types/protocols/cursor_shape/prelude,
     pkg/nayland/types/egl
 
   import pkg/[linux_input, xkb]
   import pkg/surfer/backend/wayland/bindings/egl
 
-  export linux_input, ButtonState
+  export linux_input, ButtonState, CursorShape
 
 when usingPlatform(Wayland):
   type Pools* = object
@@ -156,6 +157,11 @@ type
 
       fractionalScaleManager*: FractionalScaleManager
       fractionalScale: FractionalScale
+
+      cursorShapeManager*: CursorShapeManager
+      cursorShapeDevice*: CursorShapeDevice
+
+      currentPointerEnterSerial*: uint32
 
     title, appId: string
     controlFlow*: ControlFlow
