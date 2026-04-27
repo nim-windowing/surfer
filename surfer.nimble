@@ -9,7 +9,7 @@ srcDir = "src"
 # Dependencies
 
 requires "nim >= 2.2.0"
-requires "nayland == 0.1.4"
+requires "nayland#254c52bbcda8c3ad3f60be99e1b999968abf7a18"
 requires "shakar >= 0.1.3"
 requires "xkb >= 1.4.1"
 requires "vmath >= 2.0.1"
