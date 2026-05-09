@@ -164,7 +164,7 @@ proc flushWaylandKeyboardEvents*(app: App) =
       Event(kind: EventKind.KeyRepeated, key: KeyEvent(code: &app.repeatedKey))
     app.lastRepeatSignal = elapsed
 
-proc setWaylandCursorShape*(app: App, shape: CursorShape): bool =
+proc setWaylandCursorShape*(app: App, shape: Shape): bool =
   if app.cursorShapeDevice == nil:
     return false
 

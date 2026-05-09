@@ -18,7 +18,7 @@ when usingPlatform(Wayland):
   import pkg/[linux_input, xkb]
   import pkg/surfer/backend/wayland/bindings/egl
 
-  export linux_input, ButtonState, CursorShape
+  export linux_input, ButtonState, Shape
 
 when usingPlatform(Wayland):
   type Pools* = object

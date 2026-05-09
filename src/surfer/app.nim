@@ -96,7 +96,7 @@ proc markDamaged*(app: App) =
   when usingPlatform(Wayland):
     markWaylandDamaged(app)
 
-proc setCursorShape*(app: App, shape: CursorShape): bool {.discardable.} =
+proc setCursorShape*(app: App, shape: Shape): bool {.discardable.} =
   when usingPlatform(Wayland):
     return setWaylandCursorShape(app, shape)
 
