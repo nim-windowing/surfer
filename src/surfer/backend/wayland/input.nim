@@ -95,6 +95,11 @@ proc initializeWaylandKeyboard(app: App) =
     app.keyboardRepeatRate = rate
     app.keyboardRepeatDelay = delay
 
+    if app.keyboardRepeatRate == 0:
+      # HACK: Workaround for KDE Plasma (as of v6.6.4)
+      # For some reason, the compositor sends rate = 0?
+      app.keyboardRepeatRate = 20
+
   app.keyboard.attachCallbacks()
 
 proc initializeWaylandPointer(app: App) =
