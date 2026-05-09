@@ -5,7 +5,7 @@
       "version": "5.1.0",
       "commit": "f05c89f547006a76816254c8bf06ff7ad176543c",
       "url": "https://github.com/treeform/pixie",
-      "checksum": "3d58c2b6085e43cf04e87e7074755bc0a279bcaa53d8d8df3f3263b79a1cce36"
+      "checksum": "052745e311f6bd5fc8b6432e54abde05502cbab0f7345b72677e2be43ccea60c"
     },
     "zippy": {
       "version": "0.10.3",
