@@ -92,9 +92,6 @@ proc initializeWaylandKeyboard(app: App) =
     )
 
   app.keyboard.onRepeatInfo = proc(keyboard: Keyboard, rate, delay: int32) =
-    assert(rate > 0'i32)
-    assert(delay > 0'i32)
-
     app.keyboardRepeatRate = rate
     app.keyboardRepeatDelay = delay
 
