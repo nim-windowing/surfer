@@ -149,6 +149,7 @@ proc initializeWaylandEGL*(app: App) =
     raise newException(EGLInitError, "eglMakeCurrent() failed")
 
 proc initializeSurfaceRenderer*(app: App, surface: Surface, dimensions: IVec2) =
+  # debugecho "App::initializeSurfaceRenderer"
   app.windowSize = dimensions
 
   case app.renderer
@@ -167,6 +168,7 @@ proc initializeSurfaceRenderer*(app: App, surface: Surface, dimensions: IVec2) =
     surface.damage(0, 0, dimensions.x, dimensions.y)
     discard eglSwapBuffers(app.eglDisplay, app.eglSurface)
 
+
 proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   # Firstly, we'll create a `wl_surface`.
   # This is basically what we'll be blitting to.
@@ -179,6 +181,9 @@ proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   xdgSurface.onConfigure = proc(surface: XDGSurface, data: pointer, serial: uint32) =
     # debugecho "XDGSurface::configure"
     surface.ackConfigure(serial)
+
+    if app.renderer == Renderer.Software and app.pools.surfacePool == nil:
+      initializeSurfaceRenderer(app, app.surfaces[0], app.windowSize)
 
     if *app.nextWindowSize:
       # The XDGToplevel probably received a configure event
@@ -217,7 +222,12 @@ proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
 
   surface.frame.listen(cast[ptr AppObj](app), frameCallback)
 
-  # Renderer-specific initialization\
+  # Renderer-specific initialization
   app.renderer = renderer
-  initializeSurfaceRenderer(app, surface, dimensions)
   initializeWaylandAux(app)
+
+  app.surfaces[0].damage(0, 0, dimensions.x, dimensions.y)
+  app.surfaces[0].commit()
+
+  if app.renderer != Renderer.Software:
+    initializeSurfaceRenderer(app, app.surfaces[0], dimensions)
