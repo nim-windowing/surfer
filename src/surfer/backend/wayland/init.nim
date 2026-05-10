@@ -168,6 +168,25 @@ proc bindOptionalSingletons(app: App) =
   bindCursorShape(app)
   bindXDGDecoration(app)
 
+func setFeatureFlags(app: App) =
+  if app.layerShell != nil:
+    incl app.features, Feature.LayerShell
+
+  if app.idleInhibitManager != nil:
+    incl app.features, Feature.IdleInhibit
+
+  if app.xdgSystemBell != nil:
+    incl app.features, Feature.SystemBell
+
+  if app.fractionalScaleManager != nil:
+    incl app.features, Feature.FractionalScale
+
+  if app.cursorShapeManager != nil:
+    incl app.features, Feature.CursorShape
+
+  if app.xdgDecorationManager != nil:
+    incl app.features, Feature.XDGDecoration
+
 proc bindRequiredSingletons(app: App) =
   # debugecho "App::bindRequiredSingletons()"
   bindCompositor(app)
@@ -177,6 +196,9 @@ proc bindRequiredSingletons(app: App) =
 
   # Fetch singletons not absolutely required for basic functioning.
   bindOptionalSingletons(app)
+
+  # Set the supported feature flags.
+  setFeatureFlags(app)
 
 proc initializeWaylandSeat*(app: App) =
   let keyb = app.seat.getKeyboard()

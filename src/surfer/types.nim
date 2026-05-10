@@ -22,18 +22,35 @@ when usingPlatform(Wayland):
   export linux_input, ButtonState, Shape
 
 when usingPlatform(Wayland):
-  type Pools* = object
-    cursorPool*: ShmPool
-    surfacePool*: ShmPool
-    surface*: Buffer
-      # TODO: We'll eventually need to support multiple buffers when we add multi-toplevel support
-    cursor*: Buffer
+  type
+    Pools* = object
+      cursorPool*: ShmPool
+      surfacePool*: ShmPool
+      surface*: Buffer
+        # TODO: We'll eventually need to support multiple buffers when we add multi-toplevel support
+      cursor*: Buffer
 
-    surfaceDest*: pointer
-    cursorDest*: pointer
+      surfaceDest*: pointer
+      cursorDest*: pointer
 
-    surfacePoolSize*: int32
-    surfacePoolFd*: int32
+      surfacePoolSize*: int32
+      surfacePoolFd*: int32
+
+    Feature* {.pure, size: sizeof(uint16).} = enum
+      ## Every optional feature/protocol that is currently available to us.
+      LayerShell
+        ## wlroots' layer shell protocol. Useful for making desktop widgets, overlays, status bars, etc.
+      IdleInhibit
+        ## The Idle Inhibit protocol. Useful for ensuring the client doesn't go to sleep when focused on the program.
+      SystemBell ## The System Bell protocol. Useful for creating a foreground noise.
+      FractionalScale
+        ## The Fractional Scale protocol. Useful for rendering things in the correct proportion to the user's display.
+      CursorShape
+        ## The Cursor Shape protocol. Useful for setting the cursor's shape server-side, without having to handle the cursors yourself with `libwayland-cursor`.
+      XDGDecoration
+        ## The XDG Decoration protocol. Useful for requesting server-side-decoration (if supported), or client-side-decoration.
+
+    FeatureSet* = set[Feature]
 
 type
   AppError* = object of OSError
@@ -181,6 +198,7 @@ type
     lastRepeatSignal: int64
 
     renderer*: Renderer
+    features*: FeatureSet
 
   App* = ref AppObj
 
@@ -213,3 +231,6 @@ func closureRequested*(app: App): bool {.inline, raises: [].} =
 func hasCursor*(app: App): bool =
   when usingPlatform(Wayland):
     app.wpointer != nil
+
+func supports*(app: App, feature: Feature): bool {.inline, raises: [].} =
+  app.features.contains(feature)
