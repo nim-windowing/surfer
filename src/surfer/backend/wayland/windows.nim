@@ -6,7 +6,8 @@ import std/[importutils, options, posix, strutils]
 import
   pkg/nayland/types/[egl, display],
   pkg/nayland/types/protocols/core/[buffer, callback, compositor, shm, shm_pool, surface],
-  pkg/nayland/types/protocols/xdg_shell/[wm_base, xdg_surface, xdg_toplevel]
+  pkg/nayland/types/protocols/xdg_shell/[wm_base, xdg_surface, xdg_toplevel],
+  pkg/nayland/types/protocols/xdg_decoration/prelude
 #!fmt: on
 import pkg/[vmath, shakar]
 import
@@ -168,6 +169,17 @@ proc initializeSurfaceRenderer*(app: App, surface: Surface, dimensions: IVec2) =
     surface.damage(0, 0, dimensions.x, dimensions.y)
     discard eglSwapBuffers(app.eglDisplay, app.eglSurface)
 
+proc setWaylandCSD*(app: App, flag: bool) =
+  if app.xdgDecorationManager == nil or app.xdgToplevelDecoration == nil:
+    return
+
+  app.xdgToplevelDecoration.setMode(
+    (if flag:
+      XDGToplevelDecorationMode.ClientSide
+    else:
+      XDGToplevelDecorationMode.ServerSide
+    )
+  )
 
 proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   # Firstly, we'll create a `wl_surface`.
@@ -221,6 +233,11 @@ proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   app.display.roundtrip()
 
   surface.frame.listen(cast[ptr AppObj](app), frameCallback)
+
+  if app.xdgDecorationManager != nil:
+    app.xdgToplevelDecoration = app.xdgDecorationManager.getToplevelDecoration(xdgToplevel)
+    app.xdgToplevelDecoration.onConfigure = proc(_: XDGToplevelDecoration, mode: XDGToplevelDecorationMode) =
+      discard
 
   # Renderer-specific initialization
   app.renderer = renderer

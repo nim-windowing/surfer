@@ -100,6 +100,10 @@ proc setCursorShape*(app: App, shape: Shape): bool {.discardable.} =
   when usingPlatform(Wayland):
     return setWaylandCursorShape(app, shape)
 
+proc setClientSideDecor*(app: App, flag: bool) =
+  when usingPlatform(Wayland):
+    setWaylandCSD(app, flag)
+
 proc newApp*(title: string = "Surfer", appId: string = "xyz.xtrayambak.surfer"): App =
   App(title: title, appId: appId)
 

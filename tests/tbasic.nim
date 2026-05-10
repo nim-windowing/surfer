@@ -53,8 +53,10 @@ proc main() {.inline.} =
       # Tell the compositor that we're ready to draw another frame, if it wishes so.
       app.queueRedraw()
     of EventKind.KeyboardFocusObtained:
+      app.setClientSideDecor(true)
       echo "Keyboard focus on surface"
     of EventKind.KeyboardFocusLost:
+      app.setClientSideDecor(false)
       echo "Keyboard focus lost"
     of EventKind.KeyReleased:
       echo "Key released: " & $event.key.code

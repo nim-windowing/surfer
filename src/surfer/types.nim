@@ -13,6 +13,7 @@ when usingPlatform(Wayland):
     pkg/nayland/types/protocols/xdg_system_bell,
     pkg/nayland/types/protocols/fractional_scale/prelude,
     pkg/nayland/types/protocols/cursor_shape/prelude,
+    pkg/nayland/types/protocols/xdg_decoration/prelude,
     pkg/nayland/types/egl
 
   import pkg/[linux_input, xkb]
@@ -162,6 +163,9 @@ type
       cursorShapeDevice*: CursorShapeDevice
 
       currentPointerEnterSerial*: uint32
+
+      xdgDecorationManager*: XDGDecorationManager
+      xdgToplevelDecoration*: XDGToplevelDecoration
 
     title, appId: string
     controlFlow*: ControlFlow

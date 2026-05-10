@@ -6,6 +6,7 @@ import
   pkg/nayland/bindings/protocols/[
     core, cursor_shape_v1, xdg_shell, wlr_layer_shell_unstable_v1,
     idle_inhibit_unstable_v1, xdg_system_bell_v1, fractional_scale_v1,
+    xdg_decoration_unstable_v1,
   ],
   pkg/nayland/types/display,
   pkg/nayland/types/protocols/core/[compositor, registry, seat, shm],
@@ -14,7 +15,8 @@ import
   pkg/nayland/types/protocols/idle_inhibit/prelude,
   pkg/nayland/types/protocols/xdg_system_bell,
   pkg/nayland/types/protocols/fractional_scale/prelude,
-  pkg/nayland/types/protocols/cursor_shape/prelude
+  pkg/nayland/types/protocols/cursor_shape/prelude,
+  pkg/nayland/types/protocols/xdg_decoration/prelude
 import pkg/surfer/types, pkg/surfer/backend/wayland/input
 import pkg/shakar
 
@@ -146,12 +148,25 @@ proc bindCursorShape(app: App) =
     )
   )
 
+proc bindXDGDecoration(app: App) =
+  const XDGDecoration = "zxdg_decoration_manager_v1"
+  if not app.registry.contains(XDGDecoration):
+    return
+
+  let iface = app.registry[XDGDecoration]
+  app.xdgDecorationManager = initXDGDecorationManager(
+    app.registry.bindInterface(
+      iface.name, zxdg_decoration_manager_v1_interface.addr, iface.version
+    )
+  )
+
 proc bindOptionalSingletons(app: App) =
   bindLayerShell(app)
   bindIdleInhibitor(app)
   bindSystemBell(app)
   bindFractionalScale(app)
   bindCursorShape(app)
+  bindXDGDecoration(app)
 
 proc bindRequiredSingletons(app: App) =
   # debugecho "App::bindRequiredSingletons()"

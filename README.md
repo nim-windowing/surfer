@@ -20,7 +20,7 @@ Surfer is designed to be an easy-to-use library, with minimal gotchas like globa
 - [Idle Inhibit example](https://github.com/nim-windowing/surfer/blob/master/tests/tidleinhibit.nim)
 - [EGL + OpenGL ES example](https://github.com/nim-windowing/surfer/blob/master/tests/tbasicegl.nim)
 
-Here's a tiny program that uses CPU rendering. Surfer tries to abstract away buffer allocation to the best of its abilities, due to its origin as the windowing backend for a software-rendered terminal emulator, [nitty](https://github.com/xTrayambak/nitty).
+Here's a tiny program that uses CPU rendering. Surfer tries to abstract away buffer allocation to the best of its abilities, due to its origin as the windowing backend for a software-rendered (now GPU accelerated) terminal emulator, [nitty](https://github.com/xTrayambak/nitty).
 ```nim
 import pkg/[vmath, shakar, surfer, chroma, pixie]
 
@@ -103,6 +103,7 @@ The items here are non-sequential.
 - [ ] Presentation time support
 - [ ] Tablet support
 - [ ] Vulkan support
+- [X] Decoration mode support
 - [X] Cursor shape support
 - [ ] Clipboard support
 - [X] Fractional scale support
