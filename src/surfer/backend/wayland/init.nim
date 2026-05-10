@@ -5,8 +5,8 @@ import std/importutils
 import
   pkg/nayland/bindings/protocols/[
     core, cursor_shape_v1, xdg_shell, wlr_layer_shell_unstable_v1,
-    idle_inhibit_unstable_v1, xdg_system_bell_v1, fractional_scale_v1,
-    xdg_decoration_unstable_v1,
+    idle_inhibit_unstable_v1, tearing_control_v1, xdg_system_bell_v1,
+    fractional_scale_v1, xdg_decoration_unstable_v1,
   ],
   pkg/nayland/types/display,
   pkg/nayland/types/protocols/core/[compositor, registry, seat, shm],
@@ -16,7 +16,8 @@ import
   pkg/nayland/types/protocols/xdg_system_bell,
   pkg/nayland/types/protocols/fractional_scale/prelude,
   pkg/nayland/types/protocols/cursor_shape/prelude,
-  pkg/nayland/types/protocols/xdg_decoration/prelude
+  pkg/nayland/types/protocols/xdg_decoration/prelude,
+  pkg/nayland/types/protocols/tearing_control/prelude
 import pkg/surfer/types, pkg/surfer/backend/wayland/input
 import pkg/shakar
 
@@ -160,6 +161,18 @@ proc bindXDGDecoration(app: App) =
     )
   )
 
+proc bindTearingControl(app: App) =
+  const TearingControl = "wp_tearing_control_manager_v1"
+  if not app.registry.contains(TearingControl):
+    return
+
+  let iface = app.registry[TearingControl]
+  app.tearingControlManager = initTearingControlManager(
+    app.registry.bindInterface(
+      iface.name, wp_tearing_control_manager_v1_interface.addr, iface.version
+    )
+  )
+
 proc bindOptionalSingletons(app: App) =
   bindLayerShell(app)
   bindIdleInhibitor(app)
@@ -167,6 +180,7 @@ proc bindOptionalSingletons(app: App) =
   bindFractionalScale(app)
   bindCursorShape(app)
   bindXDGDecoration(app)
+  bindTearingControl(app)
 
 func setFeatureFlags(app: App) =
   if app.layerShell != nil:
@@ -186,6 +200,9 @@ func setFeatureFlags(app: App) =
 
   if app.xdgDecorationManager != nil:
     incl app.features, Feature.XDGDecoration
+
+  if app.tearingControlManager != nil:
+    incl app.features, Feature.TearingControl
 
 proc bindRequiredSingletons(app: App) =
   # debugecho "App::bindRequiredSingletons()"
@@ -251,3 +268,5 @@ proc initializeWaylandBackend*(app: App) =
 
   # Initialize Wayland input subsystem
   initializeWaylandInput(app)
+
+export PresentationHint

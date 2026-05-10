@@ -7,7 +7,8 @@ import
   pkg/nayland/types/[egl, display],
   pkg/nayland/types/protocols/core/[buffer, callback, compositor, shm, shm_pool, surface],
   pkg/nayland/types/protocols/xdg_shell/[wm_base, xdg_surface, xdg_toplevel],
-  pkg/nayland/types/protocols/xdg_decoration/prelude
+  pkg/nayland/types/protocols/xdg_decoration/prelude,
+  pkg/nayland/types/protocols/tearing_control/prelude
 #!fmt: on
 import pkg/[vmath, shakar]
 import
@@ -181,6 +182,12 @@ proc setWaylandCSD*(app: App, flag: bool) =
     )
   )
 
+proc setWaylandPresentationHint*(app: App, hint: PresentationHint) =
+  if app.tearingControlManager == nil or app.tearingControl == nil:
+    return
+
+  app.tearingControl.setPresentationHint(hint)
+
 proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   # Firstly, we'll create a `wl_surface`.
   # This is basically what we'll be blitting to.
@@ -238,6 +245,9 @@ proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
     app.xdgToplevelDecoration = app.xdgDecorationManager.getToplevelDecoration(xdgToplevel)
     app.xdgToplevelDecoration.onConfigure = proc(_: XDGToplevelDecoration, mode: XDGToplevelDecorationMode) =
       discard
+  
+  if app.tearingControlManager != nil:
+    app.tearingControl = app.tearingControlManager.getTearingControl(surface)
 
   # Renderer-specific initialization
   app.renderer = renderer

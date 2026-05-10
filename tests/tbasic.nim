@@ -27,6 +27,8 @@ proc main() {.inline.} =
     font.typeset("Hello, surfer!", vec2(180, 180)), translate(vec2(10, 10))
   )
 
+  app.vsync = false
+
   while not app.closureRequested:
     let eventOpt = app.flushQueue()
     if !eventOpt:

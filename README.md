@@ -105,6 +105,7 @@ The items here are non-sequential.
 - [ ] Vulkan support
 - [X] Decoration mode support
 - [X] Cursor shape support
+- [X] Tearing Control support
 - [ ] Clipboard support
 - [X] Fractional scale support
 

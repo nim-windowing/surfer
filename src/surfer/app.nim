@@ -23,7 +23,7 @@ proc createWindow*(app: App, dimensions: vmath.IVec2, renderer: Renderer) =
     createWaylandWindow(app, dimensions, renderer)
 
 when usingPlatform(Wayland):
-  export prelude.Anchor, prelude.Layer, prelude.KeyboardInteractivity
+  export prelude.Anchor, prelude.Layer, prelude.KeyboardInteractivity, PresentationHint
 
   {.push inline.}
   proc createLayerSurface*(
@@ -66,6 +66,11 @@ when usingPlatform(Wayland):
       renderer: Renderer,
   ) =
     createLayerSurface(app, layer, {}, keyboardInteractivity, renderer)
+
+  proc `vsync=`*(app: App, flag: bool) =
+    app.setWaylandPresentationHint(
+      if flag: PresentationHint.VSync else: PresentationHint.Async
+    )
 
   {.pop.}
 

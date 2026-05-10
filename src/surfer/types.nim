@@ -14,6 +14,7 @@ when usingPlatform(Wayland):
     pkg/nayland/types/protocols/fractional_scale/prelude,
     pkg/nayland/types/protocols/cursor_shape/prelude,
     pkg/nayland/types/protocols/xdg_decoration/prelude,
+    pkg/nayland/types/protocols/tearing_control/prelude,
     pkg/nayland/types/egl
 
   import pkg/[linux_input, xkb]
@@ -49,6 +50,8 @@ when usingPlatform(Wayland):
         ## The Cursor Shape protocol. Useful for setting the cursor's shape server-side, without having to handle the cursors yourself with `libwayland-cursor`.
       XDGDecoration
         ## The XDG Decoration protocol. Useful for requesting server-side-decoration (if supported), or client-side-decoration.
+      TearingControl
+        ## The Tearing Control protocol. As the name suggests, it can be used to disable V-Sync to allow for tearing at the cost of lower latency.
 
     FeatureSet* = set[Feature]
 
@@ -183,6 +186,9 @@ type
 
       xdgDecorationManager*: XDGDecorationManager
       xdgToplevelDecoration*: XDGToplevelDecoration
+
+      tearingControlManager*: TearingControlManager
+      tearingControl*: TearingControl
 
     title, appId: string
     controlFlow*: ControlFlow
