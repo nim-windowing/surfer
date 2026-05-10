@@ -126,6 +126,9 @@ proc initializeWaylandPointer(app: App) =
   app.wpointer.onAxis = proc(_: Pointer, time, axis: uint32, value: float) =
     app.queue &= Event(kind: EventKind.CursorScroll, cursor: CursorEvent(scroll: value))
 
+  app.wpointer.onAxisStop = proc(_: Pointer, time, axis: uint32) =
+    discard
+
   app.wpointer.onAxisSource = proc(_: Pointer, source: uint32) =
     discard # echo "axis source " & $source
 
