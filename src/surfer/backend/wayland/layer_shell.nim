@@ -39,6 +39,7 @@ proc createWaylandLayerSurface*(
     surface = surface, layer = layer, namespace = namespace
   ) # TODO: Support for `Output`
   layerSurface.anchor = anchors
+  layerSurface.setSize(uint32(requestedSize.x), uint32(requestedSize.y))
   layerSurface.keyboardInteractivity = interactivity
 
   app.renderer = renderer
