@@ -68,6 +68,3 @@ proc createWaylandLayerSurface*(
 
   app.surfaces[0].damage(0, 0, requestedSize.x, requestedSize.y)
   app.surfaces[0].commit()
-
-  if app.renderer != Renderer.Software:
-    initializeSurfaceRenderer(app, app.surfaces[0], requestedSize)
