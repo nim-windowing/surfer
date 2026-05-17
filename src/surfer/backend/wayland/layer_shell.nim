@@ -5,7 +5,7 @@ import std/[importutils]
 import
   pkg/nayland/types/protocols/wlr/layer_shell/prelude,
   pkg/nayland/types/protocols/core/[callback, compositor, surface]
-import pkg/surfer/types, pkg/surfer/backend/wayland/windows
+import pkg/surfer/types, pkg/surfer/backend/wayland/[init, windows]
 import pkg/vmath
 export Anchor, KeyboardInteractivity, Layer
 
@@ -61,3 +61,13 @@ proc createWaylandLayerSurface*(
   surface.frame.listen(cast[ptr AppObj](app), frameCallback)
 
   surface.commit()
+
+  # Renderer-specific initialization
+  app.renderer = renderer
+  initializeWaylandAux(app)
+
+  app.surfaces[0].damage(0, 0, requestedSize.x, requestedSize.y)
+  app.surfaces[0].commit()
+
+  if app.renderer != Renderer.Software:
+    initializeSurfaceRenderer(app, app.surfaces[0], requestedSize)

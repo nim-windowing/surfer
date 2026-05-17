@@ -51,7 +51,7 @@
     },
     "nayland": {
       "version": "0.2.0",
-      "commit": "17de41c9b06ab80872f516f7fb953b202dd7429c",
+      "commit": "97a3277582aeb26995b221d203662e61b02fd8a1",
       "url": "https://github.com/nim-windowing/nayland",
       "checksum": "10ca6c810528d89866724e896c828ee696c39ab5694dd7bb348ec3cfd655b1ad"
     },
