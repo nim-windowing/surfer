@@ -18,7 +18,6 @@ xkb = ">= 1.4.1"
 nayland = ">= 0.2.0"
 vmath = ">= 2.0.1"
 chroma = ">= 1.0.0"
-"gh:planetis-m/vulkan" = "#cc9cdb4dcb2293a0323a7607291f5ec58a3cc653"
 
 [platforms.native]
 include = ["wayland-egl", "wayland-egl-backend", "glesv2", "egl", "vulkan"]
