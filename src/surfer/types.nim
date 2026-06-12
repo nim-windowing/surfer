@@ -18,7 +18,7 @@ when usingPlatform(Wayland):
     pkg/nayland/types/egl
 
   import pkg/[linux_input, xkb]
-  import pkg/surfer/backend/wayland/bindings/egl
+  import pkg/surfer/backend/wayland/bindings/[egl, vulkan]
 
   export linux_input, ButtonState, Shape
 
@@ -137,10 +137,11 @@ type
     ## `wl_buffer` will be allocated for drawing.
     Software = 0
     GLES = 1
+    Vulkan = 2
 
   AppObj* = object
     when usingPlatform(Wayland):
-      display*: Display
+      display*: display.Display
       registry*: Registry
       compositor*: Compositor
       seat*: Seat
@@ -154,6 +155,10 @@ type
       eglDisplay*: EGLDisplay
       eglSurface*: EGLSurface
       eglContext*: EGLContext
+
+      vkInstance*: vulkan.VkInstance
+      vkSurface*: vulkan.VkSurfaceKHR
+      vkExtensions*: seq[vulkan.VkExtensionProperties]
 
       surfaces*: seq[Surface]
       xdgSurfaces*: seq[XDGSurface]
@@ -211,6 +216,7 @@ type
 when usingPlatform(Wayland):
   type
     EGLInitError* = object of AppInitError
+    VulkanInitError* = object of AppInitError
     RequiresProtocol* = object of AppInitError
     CannotBindSingleton* = object of AppInitError
 

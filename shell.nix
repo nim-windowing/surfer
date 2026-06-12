@@ -7,6 +7,8 @@ mkShell {
     wayland
     libxkbcommon
     wayland-scanner
+    vulkan-headers
+    vulkan-loader
     libGL
   ];
 
@@ -14,5 +16,6 @@ mkShell {
     wayland.dev
     libxkbcommon.dev
     libGL.dev
+    vulkan-loader.dev
   ];
 }
