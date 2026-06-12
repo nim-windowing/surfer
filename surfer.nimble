@@ -1,6 +1,6 @@
 # Package
 
-version = "0.2.4"
+version = "0.2.5"
 author = "xTrayambak"
 description = "A neat, minimal, opinionated windowing library for Nim."
 license = "BSD-3-Clause"

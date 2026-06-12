@@ -37,6 +37,12 @@
       "url": "https://github.com/treeform/flatty",
       "checksum": "7c19fafe94ec272a273d373a2ec9849c0ecb97f9bd906ba388e5c0a0e5845ad5"
     },
+    "gh:planetis-m/vulkan": {
+      "version": "0.0.0",
+      "commit": "cc9cdb4dcb2293a0323a7607291f5ec58a3cc653",
+      "url": "gh:planetis-m/vulkan",
+      "checksum": "d3f0f57cffadec70a012d25447e33ce8a973c77edb6def28103c8009f261b95b"
+    },
     "results": {
       "version": "0.5.1",
       "commit": "df8113dda4c2d74d460a8fa98252b0b771bf1f27",

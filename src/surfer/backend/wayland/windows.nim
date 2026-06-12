@@ -14,7 +14,7 @@ import pkg/[vmath, shakar]
 import
   pkg/surfer/types,
   pkg/surfer/backend/wayland/[allocator, init],
-  pkg/surfer/backend/wayland/bindings/egl
+  pkg/surfer/backend/wayland/bindings/[egl, vulkan]
 
 privateAccess(types.App)
 
@@ -100,6 +100,8 @@ proc resizeWaylandWindow*(app: App, dimensions: IVec2) =
     queueRedrawWayland(app)
   of Renderer.GLES:
     app.eglWindow.resize(dimensions.x, dimensions.y, 0'i32, 0'i32)
+  of Renderer.Vulkan:
+    discard
 
 proc initializeWaylandEGL*(app: App) =
   # Mostly based on https://gist.github.com/Miouyouyou/ca15af1c7f2696f66b0e013058f110b4
@@ -150,6 +152,55 @@ proc initializeWaylandEGL*(app: App) =
   if not eglMakeCurrent(app.eglDisplay, app.eglSurface, app.eglSurface, app.eglContext):
     raise newException(EGLInitError, "eglMakeCurrent() failed")
 
+proc initializeWaylandVulkan*(app: App, surface: Surface) =
+  debugEcho "App::initializeWaylandVulkan"
+  if app.vkInstance == cast[VkInstance](nil):
+    vkPreload()
+
+    var
+      appInfo = newVkApplicationInfo(pApplicationName = app.appId, applicationVersion = vkMakeVersion(0, 0, 0, 0), pEngineName = app.appId, engineVersion = vkMakeVersion(0, 0, 0, 0), apiVersion = (
+        when defined(surferVulkan10):
+          vkApiVersion1_0
+        elif defined(surferVulkan11): vkApiVersion1_1
+        elif defined(surferVulkan12): vkApiVersion1_2
+        elif defined(surferVulkan13): vkApiVersion1_3
+        elif defined(surferVulkan14): vkApiVersion1_4
+        else: vkApiVersion1_4
+      ))
+      extensions = [cstring(VkKhrSurfaceExtensionName), cstring(VkKhrWaylandSurfaceExtensionName)]
+
+      instanceCreateInfo = newVkInstanceCreateInfo(
+        pApplicationInfo = appInfo.addr,
+        pEnabledLayerNames = [], # TODO: Maybe expose this to the programmer somehow?
+        pEnabledExtensionNames = extensions
+      )
+
+    if vkCreateInstance(
+      instanceCreateInfo.addr, nil, app.vkInstance.addr
+    ) != VkSuccess:
+      raise newException(VulkanInitError, "Failed to create Vulkan instance!")
+
+    vkInit(app.vkInstance)
+    loadVK_KHR_surface()
+    loadVK_KHR_wayland_surface()
+
+    var extCount: uint32
+    discard vkEnumerateInstanceExtensionProperties(nil, extCount.addr, nil)
+    app.vkExtensions = newSeq[VkExtensionProperties](extCount)
+    discard vkEnumerateInstanceExtensionProperties(nil, extCount.addr, app.vkExtensions[0].addr)
+  
+  if app.vkSurface == cast[VkSurfaceKHR](nil):
+    var createInfo = VkWaylandSurfaceCreateInfoKHR(
+      sType: VkStructureType.WaylandSurfaceCreateInfoKhr,
+      pNext: nil,
+      flags: cast[VkWaylandSurfaceCreateFlagsKHR](0),
+      display: app.display.handle,
+      surface: surface.handle
+    )
+
+    if vkCreateWaylandSurfaceKHR(app.vkInstance, createInfo.addr, nil, app.vkSurface.addr) != VkSuccess:
+      raise newException(VulkanInitError, "Failed to create Vulkan Wayland surface!")
+
 proc initializeSurfaceRenderer*(app: App, surface: Surface, dimensions: IVec2) =
   ## Initialize the renderer context for the given surface.
   ##
@@ -159,6 +210,9 @@ proc initializeSurfaceRenderer*(app: App, surface: Surface, dimensions: IVec2) =
     return
 
   if app.renderer == Renderer.GLES and app.eglWindow != nil:
+    return
+
+  if app.renderer == Renderer.Vulkan and app.vkSurface != cast[VkSurfaceKHR](nil):
     return
   
   # debugecho "App::initializeSurfaceRenderer"
@@ -179,6 +233,8 @@ proc initializeSurfaceRenderer*(app: App, surface: Surface, dimensions: IVec2) =
 
     surface.damage(0, 0, dimensions.x, dimensions.y)
     discard eglSwapBuffers(app.eglDisplay, app.eglSurface)
+  of Renderer.Vulkan:
+    initializeWaylandVulkan(app, surface)
 
 proc setWaylandCSD*(app: App, flag: bool) =
   if app.xdgDecorationManager == nil or app.xdgToplevelDecoration == nil:
@@ -201,6 +257,8 @@ proc setWaylandPresentationHint*(app: App, hint: PresentationHint) =
 proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   # Firstly, we'll create a `wl_surface`.
   # This is basically what we'll be blitting to.
+  assert(app.compositor != nil, "createWaylandWindow() failed, have you called initialize() on the App yet?")
+
   let surface = app.compositor.createSurface()
   app.surfaces &= surface
 
@@ -208,7 +266,7 @@ proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   # the surface in the context of a DE/compositor.
   let xdgSurface = &app.xdgWmBase.getXDGSurface(surface)
   xdgSurface.onConfigure = proc(surface: XDGSurface, data: pointer, serial: uint32) =
-    # debugecho "XDGSurface::configure"
+    debugecho "XDGSurface::configure"
     surface.ackConfigure(serial)
 
     initializeSurfaceRenderer(app, app.surfaces[0], app.windowSize)

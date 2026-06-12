@@ -1,7 +1,7 @@
 [package]
 name = "surfer"
 description = "A neat, minimal, opinionated windowing library for Nim."
-version = "0.2.4"
+version = "0.2.5"
 license = "BSD3"
 kind = "Library"
 backend = "C"
@@ -20,5 +20,5 @@ vmath = ">= 2.0.1"
 chroma = ">= 1.0.0"
 
 [platforms.native]
-include = ["wayland-egl", "wayland-egl-backend", "glesv2", "egl"]
-link = ["wayland-egl", "wayland-egl-backend", "glesv2", "egl"]
+include = ["wayland-egl", "wayland-egl-backend", "glesv2", "egl", "vulkan"]
+link = ["wayland-egl", "wayland-egl-backend", "glesv2", "egl", "vulkan"]
