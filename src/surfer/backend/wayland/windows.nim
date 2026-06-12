@@ -245,6 +245,8 @@ proc setWaylandPresentationHint*(app: App, hint: PresentationHint) =
 proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   # Firstly, we'll create a `wl_surface`.
   # This is basically what we'll be blitting to.
+  assert(app.compositor != nil, "createWaylandWindow() failed, have you called initialize() on the App yet?")
+
   let surface = app.compositor.createSurface()
   app.surfaces &= surface
 
