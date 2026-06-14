@@ -153,7 +153,7 @@ proc initializeWaylandEGL*(app: App) =
     raise newException(EGLInitError, "eglMakeCurrent() failed")
 
 proc initializeWaylandVulkan*(app: App, surface: Surface) =
-  debugEcho "App::initializeWaylandVulkan"
+  # debugEcho "App::initializeWaylandVulkan"
   if app.vkInstance == cast[VkInstance](nil):
     vkPreload()
 
@@ -266,7 +266,7 @@ proc createWaylandWindow*(app: App, dimensions: IVec2, renderer: Renderer) =
   # the surface in the context of a DE/compositor.
   let xdgSurface = &app.xdgWmBase.getXDGSurface(surface)
   xdgSurface.onConfigure = proc(surface: XDGSurface, data: pointer, serial: uint32) =
-    debugecho "XDGSurface::configure"
+    # debugecho "XDGSurface::configure"
     surface.ackConfigure(serial)
 
     initializeSurfaceRenderer(app, app.surfaces[0], app.windowSize)
