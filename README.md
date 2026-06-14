@@ -102,7 +102,7 @@ The items here are non-sequential.
 - [X] System bell support
 - [ ] Presentation time support
 - [ ] Tablet support
-- [ ] Vulkan support
+- [X] Vulkan support
 - [X] Decoration mode support
 - [X] Cursor shape support
 - [X] Tearing Control support
