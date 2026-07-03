@@ -37,12 +37,6 @@
       "url": "https://github.com/treeform/flatty",
       "checksum": "7c19fafe94ec272a273d373a2ec9849c0ecb97f9bd906ba388e5c0a0e5845ad5"
     },
-    "gh:planetis-m/vulkan": {
-      "version": "0.0.0",
-      "commit": "cc9cdb4dcb2293a0323a7607291f5ec58a3cc653",
-      "url": "gh:planetis-m/vulkan",
-      "checksum": "d3f0f57cffadec70a012d25447e33ce8a973c77edb6def28103c8009f261b95b"
-    },
     "results": {
       "version": "0.5.1",
       "commit": "df8113dda4c2d74d460a8fa98252b0b771bf1f27",
@@ -56,10 +50,10 @@
       "checksum": "6a3ea94af15560ff056215e4e9569f01c8ed6eca4cafc1e40b2760a2b8c1377b"
     },
     "nayland": {
-      "version": "0.2.0",
-      "commit": "97a3277582aeb26995b221d203662e61b02fd8a1",
+      "version": "0.3.0",
+      "commit": "1579785a1086f4899080084e4cdd460d64757940",
       "url": "https://github.com/nim-windowing/nayland",
-      "checksum": "10ca6c810528d89866724e896c828ee696c39ab5694dd7bb348ec3cfd655b1ad"
+      "checksum": "e2b9e7a79f98914df553a8c247876c24fe11f8a3a114e3588c46115d5bf864ec"
     },
     "bumpy": {
       "version": "1.1.3",
